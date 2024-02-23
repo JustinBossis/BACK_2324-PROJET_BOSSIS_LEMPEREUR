@@ -39,13 +39,13 @@ async function insertData(dbName) {
         console.error('Error inserting users:', error);
     }*/
 
-    /*try {
+    try {
         await messagesCollection.insertMany(messages);
     } catch (error) {
         console.error('Error inserting messages:', error);
-    }*/
-/*
-    try {
+    }
+
+    /*try {
         await conversationsCollection.insertMany(conversations);
     } catch (error) {
         console.error('Error inserting conversations:', error);
@@ -69,13 +69,13 @@ function getUsers(){
 
 function getMessages(){
     return [
-        {conversation:new ObjectId("65d8a86a68e2792f60fde14d"), text:"bla bla", timestamp:1708694146, user:{_id: "65d8a7b0080138bf9f04bab5", firstname: "firstname2", lastname:"lastname2", picture:"public/images/users/avatar.png"}},
+        {conversation:new ObjectId("65d8abd02a21188ce6a505fb"), text:"bla bla", timestamp:1708694146, user:{_id: "65d8ab9237b69010b414f431", firstname: "firstname2", lastname:"lastname2", picture:"public/images/users/avatar.png"}},
     ];
 }
 
 function getConversations(){
     return [
-        {users:[new ObjectId("65d8a7b0080138bf9f04bab4"), new ObjectId("65d8a7b0080138bf9f04bab5")]}
+        {users:[new ObjectId("65d8ab9237b69010b414f430"), new ObjectId("65d8ab9237b69010b414f431")]}
     ];
 }
 
@@ -86,6 +86,6 @@ function getEvents(){
         price: 5,
         date: 1708694146,
         theme: "sport",
-        creator: new ObjectId("65d8a7b0080138bf9f04bab4")
+        creator: new ObjectId("65d8ab9237b69010b414f431")
     }]
 }
