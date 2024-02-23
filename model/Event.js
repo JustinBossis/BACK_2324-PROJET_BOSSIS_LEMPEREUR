@@ -1,4 +1,4 @@
-const { MongoClient} = require('mongodb');
+const { MongoClient, ObjectId} = require('mongodb');
 const connectionString = process.env.MONGODB_URI || "";
 const client = new MongoClient(connectionString);
 
@@ -33,6 +33,24 @@ const Event = {
             await client.close();
         }
     },
+
+    getById: async function (event_id) {
+        try {
+            await client.connect();
+            let db = client.db("projet");
+
+            let eventsCollection = await db.collection("events");
+            let usersCollection = await db.collection("users");
+            let data =  await eventsCollection.findOne({"_id": new ObjectId(event_id)});
+            data.favorite_by = await usersCollection.find({favorites: new ObjectId(event_id)}).toArray()
+            return data
+        } catch (e) {
+            throw e;
+        } finally {
+            await client.close();
+        }
+    },
+
 
     create: async function (data) {
         try {

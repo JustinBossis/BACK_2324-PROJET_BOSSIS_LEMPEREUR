@@ -8,4 +8,13 @@ router.get('/', async (req, res) => {
     res.send(await events.getAll(filters, sort));
 });
 
+router.get('/:eventId', async (req, res) => {
+    events.getById(req.params.eventId).then((event) => {
+        res.send(event);
+    }).catch(() => {
+        res.status(404).send('Page not found!');
+    })
+
+});
+
 module.exports = router;
