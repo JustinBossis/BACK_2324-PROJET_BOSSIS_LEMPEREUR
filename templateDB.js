@@ -1,7 +1,7 @@
 const { MongoClient, ObjectId} = require('mongodb');
 
 const args = process.argv.slice(2);
-const url = args[0] ?? 'mongodb://localhost:27017';
+const url = process.env.MONGODB_URI;
 const dbName = args[1] ?? "projet";
 const client = new MongoClient(url);
 

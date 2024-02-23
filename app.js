@@ -11,12 +11,13 @@ app.set('views', path.join(__dirname, "views"));
 app.set('view engine', 'pug');
 app.use(express.urlencoded({ extended: true }));
 
-
 const indexRouter = require("./routes/index.js");
 const eventsRouter = require("./routes/events.js");
+const routerUser = require("./routes/user.js");
 
 app.use("/", indexRouter);
 app.use("/events/", eventsRouter);
+app.use("/user", routerUser);
 
 app.use( (req, res, next) => {
   res.status(404).send('Page not found!');
