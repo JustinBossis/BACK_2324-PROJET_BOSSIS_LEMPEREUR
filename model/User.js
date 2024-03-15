@@ -1,14 +1,10 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const bcrypt = require("bcryptjs")
+const jwt = require('jsonwebtoken');
 
 const url = process.env.MONGODB_URI;
 const dbName = 'projet';
 const client = new MongoClient(url);
-
-
-let modelUser = {_id: "1", firstname: "firstname", lastname: "lastname", username:"username", email: "test@test.com",password: "test",admin:"false", favorites: [], birthdate:"01/12/2000", picture:"public/images/users/avatar.png", };
-
-
 
 const User = {
 
@@ -35,7 +31,11 @@ const User = {
                         }
                         if (res) {
                             // JWT
-                            resolve(user);
+                            let tokensJWT = {
+                                token: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                                refreshToken: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
+                            };
+                            resolve(tokensJWT);
                         } else {
                             console.log("Le mot de passe ne correspond pas");
                             reject(new Error('Le mot de passe ne correspond pas'));
@@ -84,6 +84,22 @@ const User = {
             await client.close();
         }
     },
+
+    refreshToken: function(refreshToken) {
+        return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+            if (err) {
+                console.error('Erreur lors de la vérification du token :', err);
+                return null;
+            } else {
+                let idUser = decoded.id;
+                const newRefreshToken = jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'});
+                return {
+                    token: jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                    refreshToken: jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
+                }
+            }
+        });
+    }
 }
 
 module.exports = User;
