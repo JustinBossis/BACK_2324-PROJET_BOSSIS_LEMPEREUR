@@ -2,6 +2,15 @@ const express = require('express');
 const user = require("../model/User");
 const router = express.Router();
 
+
+
+router.get('/connect', async (req, res) => {
+    user.connectUser(req.query.email, req.query.password).then((event) => {
+        res.send(event);
+    }).catch(() => {
+        res.status(404).send('Page not found!');
+    })
+});
 router.get('/:userId', async (req, res) => {
     user.getById(req.params.userId).then((event) => {
         res.send(event);
@@ -9,15 +18,6 @@ router.get('/:userId', async (req, res) => {
         res.status(404).send('Page not found!');
     })
 });
-
-router.get('/connect/', async (req, res) => {
-    user.connectUser(req.query.email, req.query.password).then((event) => {
-        res.send(event);
-    }).catch(() => {
-        res.status(404).send('Page not found!');
-    })
-});
-
 router.post('/',async (req, res, next) => {
     try {
         /*const data= {
