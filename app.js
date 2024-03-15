@@ -14,10 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 const indexRouter = require("./routes/index.js");
 const eventsRouter = require("./routes/events.js");
 const routerUser = require("./routes/user.js");
+const chatRouter = require("./routes/chat.js");
 
 app.use("/", indexRouter);
 app.use("/events/", eventsRouter);
 app.use("/user", routerUser);
+app.use("/chat/", chatRouter);
 
 app.use( (req, res, next) => {
   res.status(404).send('Page not found!');

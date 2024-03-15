@@ -58,7 +58,21 @@ const Event = {
             let db = client.db("projet");
             let eventsCollection = await db.collection("events");
             let event = await eventsCollection.insertOne(data);
-            return event.insertedId
+            return event.insertedId;
+        } catch (e) {
+            throw e;
+        } finally {
+            await client.close();
+        }
+    },
+
+    update: async function (id, data) {
+        try {
+            await client.connect();
+            let db = client.db("projet");
+            let eventsCollection = await db.collection("events");
+            let event = await eventsCollection.updateOne({_id: new ObjectId(id)}, {$set: data});
+            return event.acknowledged;
         } catch (e) {
             throw e;
         } finally {

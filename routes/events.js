@@ -17,4 +17,20 @@ router.get('/:eventId', async (req, res) => {
 
 });
 
+router.post('/', async(req, res) => {
+    events.create(req.body).then((eventId) => {
+        res.send(eventId);
+    }).catch(() => {
+        res.status(400).send()
+    })
+});
+
+router.put('/:eventId', async(req, res) => {
+    events.update(req.params.eventId, req.body).then((result) => {
+        res.send(result);
+    }).catch(() => {
+        res.status(400).send()
+    })
+});
+
 module.exports = router;
