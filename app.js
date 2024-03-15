@@ -54,14 +54,14 @@ io.engine.use((req, res, next) => {
     if (err) {
       return next(new Error("invalid token"));
     }
-    req.user = decoded.data;
+    req.userid = decoded.id;
     next();
   });
 });
 io.on('connection', (socket) => {
   console.log(`New connection. Socket id : ${socket.id}`);
 
-  const userId = socket.request.user.id;
+  const userId = socket.request.userid;
 
   let room = "";
 
