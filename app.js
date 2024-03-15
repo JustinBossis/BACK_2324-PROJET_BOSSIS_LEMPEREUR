@@ -25,7 +25,7 @@ const chat = require("./model/Chat");
 
 app.use("/", indexRouter);
 app.use("/events/", eventsRouter);
-app.use("/user", routerUser);
+app.use("/auth/", routerUser);
 app.use("/chat/", chatRouter);
 
 app.use( (req, res, next) => {

@@ -1,8 +1,15 @@
 const express = require('express');
 const user = require("../model/User");
+const users = require("../model/User");
 const router = express.Router();
 
-
+router.get('/', async (req, res) => {
+    user.getAll().then((event) => {
+        res.send(event);
+    }).catch(() => {
+        res.status(404).send('Page not found!');
+    })
+});
 
 router.get('/connect', async (req, res) => {
     user.connectUser(req.query.email, req.query.password).then((event) => {
@@ -11,7 +18,8 @@ router.get('/connect', async (req, res) => {
         res.status(404).send('Page not found!');
     })
 });
-router.get('/:userId', async (req, res) => {
+
+router.get('/:userId', users.authenticateToken, async (req, res) => {
     user.getById(req.params.userId).then((event) => {
         res.send(event);
     }).catch(() => {
@@ -29,9 +37,9 @@ router.post('/',async (req, res, next) => {
     }
 });
 
-router.post('/refreshtoken',(req, res, next) => {
+router.post('/refreshtoken',async (req, res, next) => {
     try {
-        res.send(user.refreshToken(req.body.refreshToken));
+        res.send(await user.useRefreshToken(req.body.refreshtoken));
     } catch (e) {
         console.error("Erreur : ", e);
         res.send(e);

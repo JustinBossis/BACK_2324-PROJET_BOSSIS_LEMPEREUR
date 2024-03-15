@@ -30,9 +30,9 @@ const User = {
                             reject(err);
                         }
                         if (res) {
-                            // JWT
+                            // Creation token JWT
                             let tokensJWT = {
-                                token: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                                token: jwt.sign({id: user._id, username: user.username, lastname: user.lastname, firstname: user.firstname, picture: user.picture}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
                                 refreshToken: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
                             };
                             resolve(tokensJWT);
@@ -61,6 +61,7 @@ const User = {
             const usersCollection = db.collection('users');
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
+            data.favorites = [];
             const newUser = {
                 ...data
             };
@@ -72,12 +73,18 @@ const User = {
         }
     },
 
+    //Renvoie un user à partir d'un id
+    //userId: id du user dont on veut recuperer les informations
     getById: async function(userId) {
         try {
             await client.connect();
             const db = client.db(dbName);
             const usersCollection = db.collection('users');
-            return await usersCollection.findOne({ _id: new ObjectId(userId) });
+            let user= await usersCollection.findOne({_id: new ObjectId(userId)});
+            if (user) {
+                delete user.password;
+                return user;
+            }
         } catch (error) {
             throw error;
         } finally {
@@ -85,20 +92,56 @@ const User = {
         }
     },
 
-    refreshToken: function(refreshToken) {
-        return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+    //Renvoie la liste de tout les users
+    getAll: async function () {
+        try {
+            await client.connect();
+            let db = client.db(dbName);
+            let usersCollection = await db.collection("users");
+            return await usersCollection.find().project({password: 0}).toArray();
+        } catch (e) {
+            throw e;
+        } finally {
+            await client.close();
+        }
+    },
+
+    //Utilisation du refresh token pour generer un nouveau token et refreshToken
+    //refreshToken : token
+    useRefreshToken: async function(refreshToken) {
+        return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
             if (err) {
                 console.error('Erreur lors de la vérification du token :', err);
                 return null;
             } else {
                 let idUser = decoded.id;
-                const newRefreshToken = jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'});
+                let user = await this.getById(idUser);
                 return {
-                    token: jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                    token: jwt.sign({
+                        id: user._id,
+                        username: user.username,
+                        lastname: user.lastname,
+                        firstname: user.firstname,
+                        picture: user.picture
+                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
                     refreshToken: jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
                 }
             }
         });
+    },
+
+    //Extraction du token JWT, vérification de validité
+    // Renvoie l'utilisateur correspondant à la requête si le token est valide
+    authenticateToken(req, res, next) {
+        const authHeader = req.headers['authorization']
+        const token = authHeader && authHeader.split(' ')[1]
+        if (token == null) return res.sendStatus(401)
+        jwt.verify(token, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
+            if (err) return res.sendStatus(403)
+            let idUser = decoded.id;
+            req.user = await this.getById(idUser);
+            next()
+        })
     }
 }
 

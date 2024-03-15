@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const chat = require("../model/Chat");
+const users = require("../model/User");
 
-router.get('/', async (req, res) => {
+router.get('/', users.authenticateToken, async (req, res) => {
     chat.getAll().then((conversations) => {
         res.send(conversations);
     }).catch(() => {
@@ -10,7 +11,7 @@ router.get('/', async (req, res) => {
     })
 });
 
-router.get('/:chatId', async (req, res) => {
+router.get('/:chatId', users.authenticateToken, async (req, res) => {
     chat.getById(req.params.chatId).then((conversation) => {
         res.send(conversation);
     }).catch(() => {
@@ -19,7 +20,7 @@ router.get('/:chatId', async (req, res) => {
 
 });
 
-router.post('/', async(req, res) => {
+router.post('/', users.authenticateToken, async(req, res) => {
     chat.create(req.body).then((chatId) => {
         res.send(chatId);
     }).catch(() => {
