@@ -57,6 +57,7 @@ const Event = {
             await client.connect();
             let db = client.db("projet");
             let eventsCollection = await db.collection("events");
+            data.creator = new Object(data.creator);
             let event = await eventsCollection.insertOne(data);
             return event.insertedId;
         } catch (e) {
