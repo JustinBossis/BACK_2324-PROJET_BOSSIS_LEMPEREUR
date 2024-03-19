@@ -1,10 +1,9 @@
 const express = require('express');
-const user = require("../model/User");
 const users = require("../model/User");
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    user.getAll().then((event) => {
+    users.getAll().then((event) => {
         res.send(event);
     }).catch(() => {
         res.status(404).send('Page not found!');
@@ -12,7 +11,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/connect', async (req, res) => {
-    user.connectUser(req.query.email, req.query.password).then((event) => {
+    users.connectUser(req.query.email, req.query.password).then((event) => {
         res.send(event);
     }).catch(() => {
         res.status(404).send('Page not found!');
@@ -20,7 +19,7 @@ router.get('/connect', async (req, res) => {
 });
 
 router.get('/:userId', users.authenticateToken, async (req, res) => {
-    user.getById(req.params.userId).then((event) => {
+    users.getById(req.params.userId).then((event) => {
         res.send(event);
     }).catch(() => {
         res.status(404).send('Page not found!');
@@ -31,7 +30,7 @@ router.post('/',async (req, res, next) => {
         /*const data= {
             firstname: "testfirst", lastname: "testlast", username:"usertest", email: "testemail@test.com",password: "tressecurise",admin:"false", favorites: [], birthdate:"01/12/2000", picture:"public/images/users/avatar.png"
         }*/
-        res.send (await user.createUser(req.body));
+        res.send (await users.createUser(req.body));
     } catch (e) {
         console.error("Erreur : ", e);
     }
@@ -39,7 +38,25 @@ router.post('/',async (req, res, next) => {
 
 router.post('/refreshtoken',async (req, res, next) => {
     try {
-        res.send(await user.useRefreshToken(req.body.refreshtoken));
+        res.send(await users.useRefreshToken(req.body.refreshtoken));
+    } catch (e) {
+        console.error("Erreur : ", e);
+        res.send(e);
+    }
+});
+
+router.post('/addFavoriteEvent', users.authenticateToken, async (req, res, next) => {
+    try {
+        res.send(await users.addToFavorite(req.body.idEvent, req.user._id.toString()));
+    } catch (e) {
+        console.error("Erreur : ", e);
+        res.send(e);
+    }
+});
+
+router.post('/removeFavoriteEvent', users.authenticateToken, async (req, res, next) => {
+    try {
+        res.send(await users.removeToFavorite(req.body.idEvent, req.user._id.toString()));
     } catch (e) {
         console.error("Erreur : ", e);
         res.send(e);

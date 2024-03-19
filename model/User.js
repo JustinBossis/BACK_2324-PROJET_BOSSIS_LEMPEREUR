@@ -32,7 +32,13 @@ const User = {
                         if (res) {
                             // Creation token JWT
                             let tokensJWT = {
-                                token: jwt.sign({id: user._id, username: user.username, lastname: user.lastname, firstname: user.firstname, picture: user.picture}, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                                token: jwt.sign({
+                                    id: user._id,
+                                    username: user.username,
+                                    lastname: user.lastname,
+                                    firstname: user.firstname,
+                                    picture: user.picture
+                                }, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
                                 refreshToken: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
                             };
                             resolve(tokensJWT);
@@ -76,12 +82,12 @@ const User = {
 
     //Renvoie un user à partir d'un id
     //userId: id du user dont on veut recuperer les informations
-    getById: async function(userId) {
+    getById: async function (userId) {
         try {
             await client.connect();
             const db = client.db(dbName);
             const usersCollection = db.collection('users');
-            let user= await usersCollection.findOne({_id: new ObjectId(userId)});
+            let user = await usersCollection.findOne({_id: new ObjectId(userId)});
             if (user) {
                 delete user.password;
                 return user;
@@ -109,7 +115,7 @@ const User = {
 
     //Utilisation du refresh token pour generer un nouveau token et refreshToken
     //refreshToken : token
-    useRefreshToken: async function(refreshToken) {
+    useRefreshToken: async function (refreshToken) {
         return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
             if (err) {
                 console.error('Erreur lors de la vérification du token :', err);
@@ -143,7 +149,54 @@ const User = {
             req.user = await User.getById(idUser);
             next()
         })
-    }
+    },
+
+    addToFavorite: async function (idEvent, userId) {
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const usersCollection = db.collection('users');
+            let user = await usersCollection.findOne({_id: new ObjectId(userId)});
+            let fav = user.favorites;
+            fav.push(idEvent);
+            await usersCollection.updateOne(
+                {_id: new ObjectId(userId)},
+                {
+                    $set: {
+                        favorites: fav
+                    }
+                });
+        } catch (error) {
+            throw error;
+        } finally {
+            await client.close();
+        }
+    },
+
+    removeToFavorite: async function (idEvent, userId) {
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const usersCollection = db.collection('users');
+            let user = await usersCollection.findOne({_id: new ObjectId(userId)});
+            let fav = user.favorites;
+            fav = fav.filter(function(item) {
+                return item !== idEvent
+            })
+            await usersCollection.updateOne(
+                {_id: new ObjectId(userId)},
+                {
+                    $set: {
+                        favorites: fav
+                    }
+                });
+        } catch (error) {
+            throw error;
+        } finally {
+            await client.close();
+        }
+    },
+
 }
 
 module.exports = User;
