@@ -10,12 +10,14 @@ require("dotenv").config()
 const port = process.env.PORT;
 const server = http.createServer(app);
 const io = new Server(server);
+const cors=require('cors');
 
 app.use(morgan('tiny'));
 app.use(express.static("public"));
 app.set('views', path.join(__dirname, "views"));
 app.set('view engine', 'pug');
 app.use(express.urlencoded({ extended: true }));
+app.use(cors())
 
 const indexRouter = require("./routes/index.js");
 const eventsRouter = require("./routes/events.js");
