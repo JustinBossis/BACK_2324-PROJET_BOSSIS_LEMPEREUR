@@ -116,7 +116,7 @@ const User = {
                 return null;
             } else {
                 let idUser = decoded.id;
-                let user = await this.getById(idUser);
+                let user = await User.getById(idUser);
                 return {
                     token: jwt.sign({
                         id: user._id,
@@ -140,7 +140,7 @@ const User = {
         jwt.verify(token, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
             if (err) return res.sendStatus(403)
             let idUser = decoded.id;
-            req.user = await this.getById(idUser);
+            req.user = await User.getById(idUser);
             next()
         })
     }
