@@ -80,6 +80,27 @@ const User = {
         }
     },
 
+    //Modification d'un user
+    //data: (mail/nom d’utilisateur/mot de passe)
+    //user : user dont on modifie les champs
+    updateUser: async function (data, user) {
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const usersCollection = db.collection('users');
+            const salt = bcrypt.genSaltSync(10);
+            data.password = bcrypt.hashSync(data.password, salt);
+            await usersCollection.updateOne(
+                { _id: user._id }, { $set: { data } }
+            );
+            return user._id.toString();
+        } catch (error) {
+            throw error;
+        } finally {
+            await client.close();
+        }
+    },
+
     //Renvoie un user à partir d'un id
     //userId: id du user dont on veut recuperer les informations
     getById: async function (userId) {
@@ -113,7 +134,7 @@ const User = {
         }
     },
 
-    //Utilisation du refresh token pour generer un nouveau token et refreshToken
+    //Utilisation du refresh token pour generer des nouveaux token et refreshToken
     //refreshToken : token
     useRefreshToken: async function (refreshToken) {
         return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
@@ -151,16 +172,18 @@ const User = {
         })
     },
 
-    addToFavorite: async function (idEvent, userId) {
+    //Ajouter un evenement à la liste des favoris de l'utilisateur
+    //idEvent : id de l'evenment a ajouté à la liste des favoris
+    //user: user à qui on ajoute l'evenement aux favoris
+    addToFavorite: async function (idEvent, user) {
         try {
             await client.connect();
             const db = client.db(dbName);
             const usersCollection = db.collection('users');
-            let user = await usersCollection.findOne({_id: new ObjectId(userId)});
             let fav = user.favorites;
             fav.push(idEvent);
             await usersCollection.updateOne(
-                {_id: new ObjectId(userId)},
+                {_id: user._id},
                 {
                     $set: {
                         favorites: fav
@@ -173,18 +196,20 @@ const User = {
         }
     },
 
-    removeToFavorite: async function (idEvent, userId) {
+    //Enlever un evenement de la liste des favoris de l'utilisateur
+    //idEvent : id de l'evenment a enlevé de la liste des favoris
+    //user: user à qui on retire l'evenement des favoris
+    removeToFavorite: async function (idEvent, user) {
         try {
             await client.connect();
             const db = client.db(dbName);
             const usersCollection = db.collection('users');
-            let user = await usersCollection.findOne({_id: new ObjectId(userId)});
             let fav = user.favorites;
             fav = fav.filter(function(item) {
                 return item !== idEvent
             })
             await usersCollection.updateOne(
-                {_id: new ObjectId(userId)},
+                {_id: user._id},
                 {
                     $set: {
                         favorites: fav

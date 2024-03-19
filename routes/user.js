@@ -36,6 +36,14 @@ router.post('/',async (req, res, next) => {
     }
 });
 
+router.post('/update', users.authenticateToken, async (req, res, next) => {
+    try {
+        res.send (await users.updateUser(req.body, req.user));
+    } catch (e) {
+        console.error("Erreur : ", e);
+    }
+});
+
 router.post('/refreshtoken',async (req, res, next) => {
     try {
         res.send(await users.useRefreshToken(req.body.refreshtoken));
@@ -47,7 +55,7 @@ router.post('/refreshtoken',async (req, res, next) => {
 
 router.post('/addFavoriteEvent', users.authenticateToken, async (req, res, next) => {
     try {
-        res.send(await users.addToFavorite(req.body.idEvent, req.user._id.toString()));
+        res.send(await users.addToFavorite(req.body.idEvent, req.user));
     } catch (e) {
         console.error("Erreur : ", e);
         res.send(e);
@@ -56,7 +64,7 @@ router.post('/addFavoriteEvent', users.authenticateToken, async (req, res, next)
 
 router.post('/removeFavoriteEvent', users.authenticateToken, async (req, res, next) => {
     try {
-        res.send(await users.removeToFavorite(req.body.idEvent, req.user._id.toString()));
+        res.send(await users.removeToFavorite(req.body.idEvent, req.user));
     } catch (e) {
         console.error("Erreur : ", e);
         res.send(e);

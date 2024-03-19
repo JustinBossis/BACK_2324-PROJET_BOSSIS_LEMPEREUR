@@ -4,6 +4,7 @@ const client = new MongoClient(connectionString);
 
 const Chat = {
 
+    //Renvoie toutes les conversations
     getAll: async function () {
         try {
             await client.connect();
@@ -18,6 +19,7 @@ const Chat = {
         }
     },
 
+    //Renvoie une conversation avec les messages à partir de son id
     getById: async function (conversation_id) {
         try {
             await client.connect();
@@ -78,7 +80,8 @@ const Chat = {
         }
     },
 
-
+    //Crée une conversation entre deux users
+    //data : users : tableau contenant 2 userId
     create: async function (data) {
         try {
             await client.connect();
@@ -93,11 +96,15 @@ const Chat = {
         }
     },
 
-    addMessage: async function (data) {
+    //Ajoute un message à la base de données
+    //data : conversationId, text, timestamp
+    //user : user qui a envoyé le message
+    addMessage: async function (data, user) {
         try {
             await client.connect();
             let db = client.db("projet");
             let messagesCollection = await db.collection("messages");
+            data.user = user._id;
             let message = await messagesCollection.insertOne(data);
             return message.insertedId;
         } catch (e) {

@@ -52,12 +52,12 @@ const Event = {
     },
 
 
-    create: async function (data) {
+    create: async function (data, user) {
         try {
             await client.connect();
             let db = client.db("projet");
             let eventsCollection = await db.collection("events");
-            data.creator = new ObjectId(data.creator);
+            data.creator = user._id;
             let event = await eventsCollection.insertOne(data);
             return event.insertedId;
         } catch (e) {
