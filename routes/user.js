@@ -10,8 +10,8 @@ router.get('/', async (req, res) => {
     })
 });
 
-router.get('/connect', async (req, res) => {
-    users.connectUser(req.query.email, req.query.password).then((event) => {
+router.post('/connect', async (req, res) => {
+    users.connectUser(req.body.email, req.body.password).then((event) => {
         res.send(event);
     }).catch(() => {
         res.status(404).send('Page not found!');
