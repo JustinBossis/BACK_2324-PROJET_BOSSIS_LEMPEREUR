@@ -61,6 +61,7 @@ const User = {
             const usersCollection = db.collection('users');
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
+            data.admin = false
             data.favorites = [];
             const newUser = {
                 ...data
