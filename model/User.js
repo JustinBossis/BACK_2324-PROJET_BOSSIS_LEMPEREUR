@@ -73,7 +73,7 @@ const User = {
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
             data.admin = false
-            data.picture = process.env.url+"/images/"+filename;
+            data.picture = process.env.URL+"/images/"+filename;
             data.favorites = [];
             const newUser = {
                 ...data
