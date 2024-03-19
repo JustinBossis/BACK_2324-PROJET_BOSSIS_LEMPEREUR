@@ -1,6 +1,8 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const bcrypt = require("bcryptjs")
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const {extname} = require("path");
 
 const url = process.env.MONGODB_URI;
 const dbName = 'projet';
@@ -60,7 +62,10 @@ const User = {
 
     //Creation d'un user
     //data: (mail/nom/prénom/nom d’utilisateur/ddn/mot de passe)
-    createUser: async function (data) {
+    createUser: async function (data, file) {
+        const filename = crypto.randomUUID().toString()+extname(file.name);
+        let uploadPath = __dirname + '/../public/images/' + filename;
+        await file.mv(uploadPath)
         try {
             await client.connect();
             const db = client.db(dbName);
@@ -68,6 +73,7 @@ const User = {
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
             data.admin = false
+            data.picture = process.env.url+"/images/"+filename;
             data.favorites = [];
             const newUser = {
                 ...data

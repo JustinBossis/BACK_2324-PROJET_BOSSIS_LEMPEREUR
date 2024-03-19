@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const http = require('http');
 const {Server} = require("socket.io");
 const jwt = require('jsonwebtoken');
+const fileUpload = require('express-fileupload');
 
 const app = express()
 require("dotenv").config()
@@ -19,6 +20,7 @@ app.set('view engine', 'pug');
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())
+app.use(fileUpload());
 
 const indexRouter = require("./routes/index.js");
 const eventsRouter = require("./routes/events.js");
