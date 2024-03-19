@@ -19,7 +19,7 @@ router.get('/connect', async (req, res) => {
 });
 
 router.get('/:userId', users.authenticateToken, async (req, res) => {
-    users.getById(req.params.userId).then((event) => {
+    users.getById(req.user._id.toString()).then((event) => {
         res.send(event);
     }).catch(() => {
         res.status(404).send('Page not found!');
