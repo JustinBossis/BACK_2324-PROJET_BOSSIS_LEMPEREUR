@@ -19,7 +19,7 @@ router.get('/:eventId', users.authenticateToken, async (req, res) => {
 });
 
 router.post('/', users.authenticateToken, async(req, res) => {
-    events.create(req.body, req.user, req.files.pictureFile).then((eventId) => {
+    events.create(req.body, req.user).then((eventId) => {
         res.send(eventId);
     }).catch(() => {
         res.status(400).send()

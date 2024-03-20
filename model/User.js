@@ -62,10 +62,7 @@ const User = {
 
     //Creation d'un user
     //data: (mail/nom/prénom/nom d’utilisateur/ddn/mot de passe)
-    createUser: async function (data, file) {
-        const filename = crypto.randomUUID().toString()+extname(file.name);
-        let uploadPath = __dirname + '/../public/images/' + filename;
-        await file.mv(uploadPath)
+    createUser: async function (data) {
         try {
             await client.connect();
             const db = client.db(dbName);
@@ -73,7 +70,6 @@ const User = {
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
             data.admin = false
-            data.picture = process.env.URL+"/images/"+filename;
             data.favorites = [];
             const newUser = {
                 ...data

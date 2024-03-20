@@ -54,16 +54,12 @@ const Event = {
     },
 
 
-    create: async function (data, user, file) {
-        const filename = crypto.randomUUID().toString()+extname(file.name);
-        let uploadPath = __dirname + '/../public/images/events/' + filename;
-        await file.mv(uploadPath)
+    create: async function (data, user) {
         try {
             await client.connect();
             let db = client.db("projet");
             let eventsCollection = await db.collection("events");
             data.creator = user._id;
-            data.picture = process.env.URL+"/images/events/"+filename;
             let event = await eventsCollection.insertOne(data);
             return event.insertedId;
         } catch (e) {

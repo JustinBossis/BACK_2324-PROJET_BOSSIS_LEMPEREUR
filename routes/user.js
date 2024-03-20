@@ -30,7 +30,7 @@ router.post('/',async (req, res, next) => {
         /*const data= {
             firstname: "testfirst", lastname: "testlast", username:"usertest", email: "testemail@test.com",password: "tressecurise",admin:"false", favorites: [], birthdate:"01/12/2000", picture:"public/images/users/avatar.png"
         }*/
-        res.send (await users.createUser(req.body, req.files.pictureFile));
+        res.send (await users.createUser(req.body));
     } catch (e) {
         console.error("Erreur : ", e);
     }
