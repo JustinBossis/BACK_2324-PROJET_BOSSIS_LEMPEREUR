@@ -42,6 +42,16 @@ const Event = {
         }
     },
 
+    getByCreator: async function (user_id) {
+        try {
+            const db = await connectToDatabase()
+            let eventsCollection = await db.collection("events");
+            return await eventsCollection.find({"creator": new ObjectId(user_id)}).toArray()
+        } catch (e) {
+            throw e;
+        }
+    },
+
 
     create: async function (data, user) {
         try {

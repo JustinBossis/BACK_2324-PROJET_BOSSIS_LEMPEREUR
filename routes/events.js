@@ -9,6 +9,14 @@ router.get('/', users.authenticateToken, async (req, res) => {
     res.send(await events.getAll(filters, sort));
 });
 
+router.get('/user/:userId', users.authenticateToken, async (req, res) => {
+    events.getByCreator(req.params.userId).then((events) => {
+        res.send(events);
+    }).catch(() => {
+        res.status(404).send('Page not found!');
+    })
+});
+
 router.get('/:eventId', users.authenticateToken, async (req, res) => {
     events.getById(req.params.eventId).then((event) => {
         res.send(event);
