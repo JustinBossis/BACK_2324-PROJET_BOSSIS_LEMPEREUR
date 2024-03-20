@@ -1,5 +1,5 @@
 const { ObjectId} = require('mongodb');
-const {connectToDatabase}  = require("../db.js")
+const connectToDatabase  = require("../db.js")
 
 const Event = {
 

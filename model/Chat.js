@@ -1,7 +1,7 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const connectionString = process.env.MONGODB_URI || "";
 const client = new MongoClient(connectionString);
-const {connectToDatabase}  = require("../db.js")
+const connectToDatabase  = require("../db.js")
 
 const Chat = {
 

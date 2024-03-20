@@ -1,7 +1,7 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const bcrypt = require("bcryptjs")
 const jwt = require('jsonwebtoken');
-const {connectToDatabase}  = require("../db.js")
+const connectToDatabase = require("../db.js")
 
 
 const User = {
