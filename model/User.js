@@ -163,7 +163,7 @@ const User = {
             const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             let fav = user.favorites;
-            fav.push(idEvent);
+            fav.push(new ObjectId(idEvent));
             await usersCollection.updateOne(
                 {_id: user._id},
                 {
