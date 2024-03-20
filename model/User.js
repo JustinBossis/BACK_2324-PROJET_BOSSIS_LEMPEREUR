@@ -1,12 +1,8 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const bcrypt = require("bcryptjs")
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const {extname} = require("path");
+const {connectToDatabase}  = require("../db.js")
 
-const url = process.env.MONGODB_URI;
-const dbName = 'projet';
-const client = new MongoClient(url);
 
 const User = {
 
@@ -14,8 +10,7 @@ const User = {
     //email password
     connectUser: async function (email, password) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             const user = await usersCollection.findOne({email: email});
             if (!user) {
@@ -55,8 +50,6 @@ const User = {
             }
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 
@@ -64,8 +57,7 @@ const User = {
     //data: (mail/nom/prénom/nom d’utilisateur/ddn/mot de passe)
     createUser: async function (data) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
@@ -77,8 +69,6 @@ const User = {
             return (await usersCollection.insertOne(newUser)).insertedId;
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 
@@ -87,8 +77,7 @@ const User = {
     //user : user dont on modifie les champs
     updateUser: async function (data, user) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
@@ -98,8 +87,6 @@ const User = {
             return user._id.toString();
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 
@@ -107,8 +94,7 @@ const User = {
     //userId: id du user dont on veut recuperer les informations
     getById: async function (userId) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             let user = await usersCollection.findOne({_id: new ObjectId(userId)});
             if (user) {
@@ -117,22 +103,17 @@ const User = {
             }
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 
     //Renvoie la liste de tout les users
     getAll: async function () {
         try {
-            await client.connect();
-            let db = client.db(dbName);
+            const db = await connectToDatabase()
             let usersCollection = await db.collection("users");
             return await usersCollection.find().project({password: 0}).toArray();
         } catch (e) {
             throw e;
-        } finally {
-            await client.close();
         }
     },
 
@@ -179,8 +160,7 @@ const User = {
     //user: user à qui on ajoute l'evenement aux favoris
     addToFavorite: async function (idEvent, user) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             let fav = user.favorites;
             fav.push(idEvent);
@@ -193,8 +173,6 @@ const User = {
                 });
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 
@@ -203,8 +181,7 @@ const User = {
     //user: user à qui on retire l'evenement des favoris
     removeToFavorite: async function (idEvent, user) {
         try {
-            await client.connect();
-            const db = client.db(dbName);
+            const db = await connectToDatabase()
             const usersCollection = db.collection('users');
             let fav = user.favorites;
             fav = fav.filter(function(item) {
@@ -219,8 +196,6 @@ const User = {
                 });
         } catch (error) {
             throw error;
-        } finally {
-            await client.close();
         }
     },
 

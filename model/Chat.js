@@ -1,30 +1,26 @@
 const { MongoClient, ObjectId} = require('mongodb');
 const connectionString = process.env.MONGODB_URI || "";
 const client = new MongoClient(connectionString);
+const {connectToDatabase}  = require("../db.js")
 
 const Chat = {
 
     //Renvoie toutes les conversations
     getAll: async function () {
         try {
-            await client.connect();
-            let db = client.db("projet");
-
+            const db = await connectToDatabase()
             let conversationsCollection = await db.collection("conversations");
             return await conversationsCollection.aggregate([{$lookup: { from: "users", localField: "users", foreignField: "_id", as: "users_data", pipeline: [{ $project: { firstname: 1, lastname: 1, username: 1, picture: 1 } }]}}]).toArray();
         } catch (e) {
             throw e;
-        } finally {
-            await client.close();
         }
     },
 
     //Renvoie une conversation avec les messages à partir de son id
     getById: async function (conversation_id) {
         try {
-            await client.connect();
-            let db = client.db("projet");
 
+            const db = await connectToDatabase()
             let conversationsCollection = await db.collection("conversations");
             return  await conversationsCollection.aggregate([
                 {
@@ -75,8 +71,6 @@ const Chat = {
             ]).toArray();
         } catch (e) {
             throw e;
-        } finally {
-            await client.close();
         }
     },
 
@@ -84,15 +78,12 @@ const Chat = {
     //data : users : tableau contenant 2 userId
     create: async function (data) {
         try {
-            await client.connect();
-            let db = client.db("projet");
+            const db = await connectToDatabase()
             let conversationsCollection = await db.collection("conversations");
             let conversation = await conversationsCollection.insertOne(data);
             return conversation.insertedId;
         } catch (e) {
             throw e;
-        } finally {
-            await client.close();
         }
     },
 
@@ -101,16 +92,13 @@ const Chat = {
     //user : user qui a envoyé le message
     addMessage: async function (data, user) {
         try {
-            await client.connect();
-            let db = client.db("projet");
+            const db = await connectToDatabase()
             let messagesCollection = await db.collection("messages");
             data.user = user._id;
             let message = await messagesCollection.insertOne(data);
             return message.insertedId;
         } catch (e) {
             throw e;
-        } finally {
-            await client.close();
         }
     },
 
