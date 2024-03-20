@@ -40,7 +40,7 @@ const User = {
                                     lastname: user.lastname,
                                     firstname: user.firstname,
                                     picture: user.picture
-                                }, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                                }, process.env.JWT_PRIVATE_KEY, {expiresIn: 6000}),
                                 refreshToken: jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
                             };
                             resolve(tokensJWT);
@@ -157,7 +157,7 @@ const User = {
                         lastname: user.lastname,
                         firstname: user.firstname,
                         picture: user.picture
-                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: 120}),
+                    }, process.env.JWT_PRIVATE_KEY, {expiresIn: 6000}),
                     refreshToken: jwt.sign({id: idUser}, process.env.JWT_PRIVATE_KEY, {expiresIn: '1d'})
                 }
             }
