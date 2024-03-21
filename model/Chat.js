@@ -5,17 +5,6 @@ const connectToDatabase  = require("../db.js")
 
 const Chat = {
 
-    //Renvoie toutes les conversations
-    getAll: async function () {
-        try {
-            const db = await connectToDatabase()
-            let conversationsCollection = await db.collection("conversations");
-            return await conversationsCollection.aggregate([{$lookup: { from: "users", localField: "users", foreignField: "_id", as: "users_data", pipeline: [{ $project: { firstname: 1, lastname: 1, username: 1, picture: 1 } }]}}]).toArray();
-        } catch (e) {
-            throw e;
-        }
-    },
-
     //Renvoie une conversation avec les messages à partir de son id
     getById: async function (other_id, user_id) {
         try {
@@ -73,7 +62,7 @@ const Chat = {
                 { $limit: 1 }
             ]).toArray();
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la récupération de la conversation !");
         }
     },
 
@@ -87,7 +76,7 @@ const Chat = {
             let conversation = await conversationsCollection.insertOne(data);
             return conversation.insertedId;
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la création de la conversation !");
         }
     },
 
@@ -103,7 +92,7 @@ const Chat = {
             let message = await messagesCollection.insertOne(data);
             return message.insertedId;
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la sauvegarde duu message !");
         }
     },
 

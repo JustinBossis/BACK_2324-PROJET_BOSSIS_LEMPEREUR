@@ -20,12 +20,14 @@ const Event = {
                         case "price":
                             filterList.price = f.value;
                             break;
+                        default:
+                            throw new Error("Impossible de trier selon la propriété suivante : ", f.property)
                     }
                 }
             }
             return await eventsCollection.find(filterList).sort(sort_on).toArray();
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la récupération des évènements !")
         }
     },
 
@@ -35,10 +37,14 @@ const Event = {
             let eventsCollection = await db.collection("events");
             let usersCollection = await db.collection("users");
             let data =  await eventsCollection.findOne({"_id": new ObjectId(event_id)});
-            data.favorite_by = await usersCollection.find({favorites: new ObjectId(event_id)}).toArray()
-            return data
+            if(data){
+                data.favorite_by = await usersCollection.find({favorites: new ObjectId(event_id)}).toArray()
+                return data
+            }else{
+                throw new Error("Cet évènement n'existe pas !")
+            }
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la récupération de l'évènement !")
         }
     },
 
@@ -48,7 +54,7 @@ const Event = {
             let eventsCollection = await db.collection("events");
             return await eventsCollection.find({"creator": new ObjectId(user_id)}).toArray()
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur s'est produite lors de la récupération des évènements !")
         }
     },
 
@@ -61,7 +67,7 @@ const Event = {
             let event = await eventsCollection.insertOne(data);
             return event.insertedId;
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur est survenue lors de la création de l'évènement !");
         }
     },
 
@@ -73,7 +79,7 @@ const Event = {
             let event = await eventsCollection.updateOne({_id: new ObjectId(id)}, {$set: data});
             return event.acknowledged;
         } catch (e) {
-            throw e;
+            throw new Error("Une erreur est survenue lors de la mise à jour de l'évènement !");
         }
     }
 

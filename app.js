@@ -90,6 +90,8 @@ io.on('connection', (socket) => {
     chat.addMessage(data, userId).then((id) => {
       data._id = id;
       io.to(room).emit("chat", data)
+    }).catch((error) => {
+      socket.emit("error", error.message);
     })
 
   });

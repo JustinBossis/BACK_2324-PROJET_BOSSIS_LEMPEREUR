@@ -13,16 +13,16 @@ router.get('/', async (req, res) => {
 router.post('/connect', async (req, res) => {
     users.connectUser(req.body.email, req.body.password).then((event) => {
         res.send(event);
-    }).catch(() => {
-        res.status(404).send('Page not found!');
+    }).catch((error) => {
+        res.status(401).send({error: error.message});
     })
 });
 
 router.get('/:userId', users.authenticateToken, async (req, res) => {
     users.getById(req.user._id.toString()).then((event) => {
         res.send(event);
-    }).catch(() => {
-        res.status(404).send('Page not found!');
+    }).catch((error) => {
+        res.status(404).send({error: error.message});
     })
 });
 router.post('/',async (req, res, next) => {
@@ -32,7 +32,7 @@ router.post('/',async (req, res, next) => {
         }*/
         res.send (await users.createUser(req.body));
     } catch (e) {
-        console.error("Erreur : ", e);
+        res.status(400).send({error: e.message});
     }
 });
 
@@ -49,7 +49,7 @@ router.post('/refreshtoken',async (req, res, next) => {
         res.send(await users.useRefreshToken(req.body.refreshtoken));
     } catch (e) {
         console.error("Erreur : ", e);
-        res.send(e);
+        res.status(401).send({error: e.message});
     }
 });
 
@@ -57,8 +57,7 @@ router.post('/addFavoriteEvent', users.authenticateToken, async (req, res, next)
     try {
         res.send(await users.addToFavorite(req.body.idEvent, req.user));
     } catch (e) {
-        console.error("Erreur : ", e);
-        res.send(e);
+        res.status(404).send({error: "Une erreur s'est produite lors de l'ajout aux favoris !"})
     }
 });
 
@@ -66,8 +65,7 @@ router.post('/removeFavoriteEvent', users.authenticateToken, async (req, res, ne
     try {
         res.send(await users.removeToFavorite(req.body.idEvent, req.user));
     } catch (e) {
-        console.error("Erreur : ", e);
-        res.send(e);
+        res.status(404).send({error: "Une erreur s'est produite lors de la suppression des favoris !"})
     }
 });
 

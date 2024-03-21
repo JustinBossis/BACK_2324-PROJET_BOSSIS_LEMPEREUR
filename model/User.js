@@ -14,8 +14,7 @@ const User = {
             const usersCollection = db.collection('users');
             const user = await usersCollection.findOne({email: email});
             if (!user) {
-                console.log("pas de user trouvé avec l'adresse mail");
-                return null;
+                throw new Error("Cette adresse email n'existe pas !");
             }
             //verifier si le password correspond
             try {
@@ -40,8 +39,7 @@ const User = {
                             };
                             resolve(tokensJWT);
                         } else {
-                            console.log("Le mot de passe ne correspond pas");
-                            reject(new Error('Le mot de passe ne correspond pas'));
+                            reject(new Error("Le mot de passe n'est pas bon!"));
                         }
                     });
                 });
@@ -68,7 +66,7 @@ const User = {
             };
             return (await usersCollection.insertOne(newUser)).insertedId;
         } catch (error) {
-            throw error;
+            throw new Error("Une erreur est survenue lors de la création de l'utilisateur !");
         }
     },
 
@@ -100,6 +98,8 @@ const User = {
             if (user) {
                 delete user.password;
                 return user;
+            }else{
+                throw new Error("Utilisateur non trouvé !")
             }
         } catch (error) {
             throw error;
@@ -122,8 +122,7 @@ const User = {
     useRefreshToken: async function (refreshToken) {
         return jwt.verify(refreshToken, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
             if (err) {
-                console.error('Erreur lors de la vérification du token :', err);
-                return null;
+                throw new Error("Le token est invalide !");
             } else {
                 let idUser = decoded.id;
                 let user = await User.getById(idUser);
