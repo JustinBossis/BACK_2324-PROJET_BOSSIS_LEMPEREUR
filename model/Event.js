@@ -69,6 +69,7 @@ const Event = {
         try {
             const db = await connectToDatabase()
             let eventsCollection = await db.collection("events");
+            data.creator = new ObjectId(data.creator);
             let event = await eventsCollection.updateOne({_id: new ObjectId(id)}, {$set: data});
             return event.acknowledged;
         } catch (e) {
