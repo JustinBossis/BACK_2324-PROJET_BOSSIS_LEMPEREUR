@@ -57,6 +57,11 @@ const User = {
         try {
             const db = await connectToDatabase()
             const usersCollection = db.collection('users');
+            const user = await usersCollection.findOne({email: email});
+            if (user) {
+                throw new Error("Cette adresse email est déjà utilisée !");
+            }
+
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
             data.admin = false
