@@ -212,10 +212,12 @@ const User = {
         }
     },
 
+    // Définition de la méthode pour récupérer les événements favoris d'un utilisateur
     getFavoriteEvents: async function(userId) {
         try {
             const db = await connectToDatabase()
             const usersCollection = db.collection('users');
+            // Utilisation de l'agrégation pour lier les collections d'utilisateurs et d'événements
             let user = await usersCollection.aggregate([
                 {
                     $lookup: {
@@ -227,9 +229,6 @@ const User = {
                 },
                 {
                     $match:
-                    /**
-                     * query: The query in MQL.
-                     */
                         {
                             _id: userId,
                         },
