@@ -63,6 +63,12 @@ const Event = {
         try {
             const db = await connectToDatabase()
             let eventsCollection = await db.collection("events");
+            if((new Date(data.date)).getTime() > 0){
+                data.timestamp = (new Date(data.date)).getTime()
+                delete data.date;
+            }else{
+                throw new Error("La date indiquée n'est pas valide !");
+            }
             data.creator = user._id;
             let event = await eventsCollection.insertOne(data);
             return event.insertedId;
@@ -76,6 +82,12 @@ const Event = {
             const db = await connectToDatabase()
             let eventsCollection = await db.collection("events");
             data.creator = new ObjectId(data.creator);
+            if((new Date(data.date)).getTime() > 0){
+                data.timestamp = (new Date(data.date)).getTime()
+                delete data.date;
+            }else{
+                throw new Error("La date indiquée n'est pas valide !");
+            }
             let event = await eventsCollection.updateOne({_id: new ObjectId(id)}, {$set: data});
             return event.acknowledged;
         } catch (e) {

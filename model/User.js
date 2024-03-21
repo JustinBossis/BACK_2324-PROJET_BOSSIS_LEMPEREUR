@@ -57,9 +57,9 @@ const User = {
         try {
             const db = await connectToDatabase()
             const usersCollection = db.collection('users');
-            const user = await usersCollection.findOne({email: email});
+            const user = await usersCollection.findOne({email: data.email});
             if (user) {
-                throw new Error("Cette adresse email est déjà utilisée !");
+                throw new Error("email");
             }
 
             const salt = bcrypt.genSaltSync(10);
@@ -71,7 +71,11 @@ const User = {
             };
             return (await usersCollection.insertOne(newUser)).insertedId;
         } catch (error) {
-            throw new Error("Une erreur est survenue lors de la création de l'utilisateur !");
+            if(error.message === "email"){
+                throw new Error("Cette adresse email est déjà utilisée !");
+            }else{
+                throw new Error("Une erreur est survenue lors de la création de l'utilisateur !");
+            }
         }
     },
 
