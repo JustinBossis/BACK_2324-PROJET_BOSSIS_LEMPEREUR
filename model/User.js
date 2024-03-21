@@ -61,7 +61,12 @@ const User = {
             if (user) {
                 throw new Error("email");
             }
-
+            if((new Date(data.birth)).getTime() > 0){
+                data.birthdate = (new Date(data.birth)).getTime()
+                delete data.birth;
+            }else{
+                throw new Error("La date indiquée n'est pas valide !");
+            }
             const salt = bcrypt.genSaltSync(10);
             data.password = bcrypt.hashSync(data.password, salt);
             data.admin = false
