@@ -19,8 +19,9 @@ router.get('/:userId', users.authenticateToken, async (req, res) => {
                     res.send(conv);
                 });
             })
+        }else{
+            res.send(conversation);
         }
-        res.send(conversation);
     }).catch(() => {
         res.status(404).send('Page not found!');
     })

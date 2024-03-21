@@ -83,7 +83,8 @@ const Chat = {
         try {
             const db = await connectToDatabase()
             let conversationsCollection = await db.collection("conversations");
-            let conversation = await conversationsCollection.insertOne(data.map(userId => new ObjectId(userId)));
+            data.users = data.users.map(userId => new ObjectId(userId));
+            let conversation = await conversationsCollection.insertOne(data);
             return conversation.insertedId;
         } catch (e) {
             throw e;
