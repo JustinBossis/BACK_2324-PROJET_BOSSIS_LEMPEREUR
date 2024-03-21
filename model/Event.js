@@ -15,7 +15,7 @@ const Event = {
                             filterList.theme = f.value;
                             break;
                         case "name":
-                            filterList.name = {$regex: f.value};
+                            filterList.name = {$regex: f.value, $options: "i"};
                             break;
                         case "price":
                             filterList.price = f.value;
