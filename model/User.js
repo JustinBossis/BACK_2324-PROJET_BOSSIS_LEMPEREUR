@@ -185,7 +185,7 @@ const User = {
             const usersCollection = db.collection('users');
             let fav = user.favorites;
             fav = fav.filter(function(item) {
-                return item !== new ObjectId(idEvent)
+                return item.toString() !== idEvent
             })
             await usersCollection.updateOne(
                 {_id: user._id},
