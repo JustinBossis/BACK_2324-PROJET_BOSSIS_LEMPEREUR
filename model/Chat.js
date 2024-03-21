@@ -17,7 +17,7 @@ const Chat = {
     },
 
     //Renvoie une conversation avec les messages à partir de son id
-    getById: async function (conversation_id) {
+    getById: async function (other_id, user_id) {
         try {
 
             const db = await connectToDatabase()
@@ -35,10 +35,7 @@ const Chat = {
                                     {
                                         $project:
                                             {
-                                                firstname: 1,
-                                                lastname: 1,
-                                                username: 1,
-                                                picture: 1
+                                                password: 0,
                                             }
                                     }
                                 ]
@@ -64,7 +61,13 @@ const Chat = {
                 {
                     $match:
                         {
-                            "_id" : new ObjectId(conversation_id)
+                            "users" : {$all: [new ObjectId(other_id), user_id]}
+                        }
+                },
+                {
+                    $project:
+                        {
+                            users: 0,
                         }
                 },
                 { $limit: 1 }
@@ -80,7 +83,7 @@ const Chat = {
         try {
             const db = await connectToDatabase()
             let conversationsCollection = await db.collection("conversations");
-            let conversation = await conversationsCollection.insertOne(data);
+            let conversation = await conversationsCollection.insertOne(data.map(userId => new ObjectId(userId)));
             return conversation.insertedId;
         } catch (e) {
             throw e;
@@ -90,11 +93,12 @@ const Chat = {
     //Ajoute un message à la base de données
     //data : conversationId, text, timestamp
     //user : user qui a envoyé le message
-    addMessage: async function (data, user) {
+    addMessage: async function (data, userId) {
         try {
             const db = await connectToDatabase()
             let messagesCollection = await db.collection("messages");
-            data.user = user._id;
+            data.conversation = new ObjectId(data.conversation);
+            data.user = new ObjectId(userId);
             let message = await messagesCollection.insertOne(data);
             return message.insertedId;
         } catch (e) {

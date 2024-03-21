@@ -9,7 +9,12 @@ const app = express()
 require("dotenv").config()
 const port = process.env.PORT;
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"]
+  }
+});
 const cors=require('cors');
 
 app.use(morgan('tiny'));
@@ -61,6 +66,7 @@ io.engine.use((req, res, next) => {
     next();
   });
 });
+
 io.on('connection', (socket) => {
   console.log(`New connection. Socket id : ${socket.id}`);
 
@@ -68,17 +74,29 @@ io.on('connection', (socket) => {
 
   let room = "";
 
+  socket.on('joinRoom', (data) => {
+    room = data.conversation;
+    socket.join(room);
+    console.log(`join room ${room}`)
+  });
+
+  socket.on('leaveRoom', () => {
+    socket.leave(room);
+    console.log(`leave room ${room}`)
+    room = "";
+  });
+
   socket.on('message', (data) => {
-    console.log(data);
-    chat.addMessage(data).then(() => {
-      io.to(room).emit("chat", {"message": data})
+    chat.addMessage(data, userId).then((id) => {
+      data._id = id;
+      io.to(room).emit("chat", data)
     })
 
   });
 
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Listening on port ${port}`);
   console.log(process.env.NODE_ENV)
 });

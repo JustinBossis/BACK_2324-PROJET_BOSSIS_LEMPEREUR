@@ -11,8 +11,15 @@ router.get('/', users.authenticateToken, async (req, res) => {
     })
 });
 
-router.get('/:chatId', users.authenticateToken, async (req, res) => {
-    chat.getById(req.params.chatId).then((conversation) => {
+router.get('/:userId', users.authenticateToken, async (req, res) => {
+    chat.getById(req.params.userId, req.user._id).then((conversation) => {
+        if(conversation.length === 0){
+            chat.create({users: [req.params.userId, req.user._id.toString()]}).then(() => {
+                chat.getById(req.params.userId, req.user._id).then(conv =>{
+                    res.send(conv);
+                });
+            })
+        }
         res.send(conversation);
     }).catch(() => {
         res.status(404).send('Page not found!');
