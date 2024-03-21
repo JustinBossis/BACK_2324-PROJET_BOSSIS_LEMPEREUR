@@ -18,6 +18,18 @@ router.post('/connect', async (req, res) => {
     })
 });
 
+router.get('/favorites', users.authenticateToken, async (req, res) => {
+    users.getFavoriteEvents(req.user._id).then((events) => {
+        if(events.length === 1){
+            res.send(events[0].events);
+        }else{
+            res.status(404).send({message: "Aucun utilisateur trouvé !"});
+        }
+    }).catch((error) => {
+        res.status(404).send({message: error.message});
+    })
+});
+
 router.get('/:userId', users.authenticateToken, async (req, res) => {
     users.getById(req.user._id.toString()).then((event) => {
         res.send(event);

@@ -207,6 +207,47 @@ const User = {
         }
     },
 
+    getFavoriteEvents: async function(userId) {
+        try {
+            const db = await connectToDatabase()
+            const usersCollection = db.collection('users');
+            let user = await usersCollection.aggregate([
+                {
+                    $lookup: {
+                        from: "events",
+                        localField: "favorites",
+                        foreignField: "_id",
+                        as: "events",
+                    },
+                },
+                {
+                    $match:
+                    /**
+                     * query: The query in MQL.
+                     */
+                        {
+                            _id: userId,
+                        },
+                },
+                {
+                    $project:
+                        {
+                            events: 1,
+                            _id: 0,
+                        },
+                },
+                { $limit: 1 }
+            ]).toArray();
+            if (user) {
+                return user;
+            }else{
+                throw new Error("Utilisateur non trouvé !")
+            }
+        } catch (error) {
+            throw error;
+        }
+    },
+
 }
 
 module.exports = User;
